@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Colors from '../constants/colors';
 
 interface Props {
 	isSelected: boolean;
@@ -10,12 +11,6 @@ interface Props {
 const GridText = (props: Props) => {
 
 	const { isSelected, text, onPress } = props;
-
-	const [selected, setSelected] = React.useState(false);
-
-	function handleSelectOption() {
-		setSelected(!selected);
-	}
 
 	return (
 		<TouchableOpacity 
@@ -39,26 +34,21 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		height: 50,
 		width: 80,
-		borderColor: '#E8E8E8',
+		borderColor: Colors.opBorder,
 		borderWidth: 1,
 		borderBottomWidth: 4,
-		borderBottomColor: '#D3D3D3'
+		borderBottomColor: Colors.opBorderBottom
 	},
 	text: {
 		fontSize: 16,
-		color: '#454545',
+		color: Colors.opTxt,
 		fontFamily: 'Roboto_400Regular'
 	},
 	selected: {
-		borderColor: '#F0F0F0',
-		borderBottomColor: '#C8C8C8',
-		backgroundColor: '#F0F0F0'
+		borderColor: Colors.opSelectedBg,
+		borderBottomColor: Colors.opSelectedBgBottom,
+		backgroundColor: Colors.opSelectedBg
 	}
-		// selected: {
-	// 	borderColor: '#ccffcc',
-	// 	borderBottomColor: '#80ff80',
-	// 	backgroundColor: '#ccffcc'
-	// }
 
 })
 

@@ -1,9 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, Alert } from 'react-native';
-import { Transition, Transitioning } from 'react-native-reanimated'
-// import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import {
+	View,
+	Text,
+	StyleSheet,
+	TouchableWithoutFeedback,
+	Dimensions
+} from 'react-native';
+import Animated, { Transition, Transitioning, Extrapolate } from 'react-native-reanimated'
+import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import {useMemoOne} from 'use-memo-one';
+
 import runTiming from '../../constants/runTiming';
-import Animated, {Extrapolate} from 'react-native-reanimated';
+import Colors from '../../constants/colors';
+import BottomSheet from '../../components/bottomSheet'
 
 const {
 	Value,
@@ -12,19 +21,18 @@ const {
 	eq,
 	set,
 	Clock,
-	startClock,
-	stopClock,
-	clockRunning,
-	timing,
-	debug,
 	interpolate,
-	concat
 } = Animated;
 
 import { cases } from '../../constants/cases';
 import GridText from '../../components/gridText';
 
+const {width, height} = Dimensions.get('window');
+
 const Home: React.FC = () => {
+
+	const caseNames = ['nominative', 'accusative', 'dative', 'genitive'];
+	const genderNames = ['masculine', 'feminine', 'neuter'];
 
 	const [caseArticles, setCaseArticles] = React.useState<string[]>([
 		'der', 'die', 'das', 'den', 'dem', 'des'
@@ -32,31 +40,59 @@ const Home: React.FC = () => {
 	const [isSelected, setIsSelected] = React.useState<boolean[]>([
 		false, false, false, false, false, false
 	]);
-	const [rndCaseGender, setRndCaseGender] = React.useState<string[]>([]);
+
+	const [randomCase, setRandomCase] = React.useState('');
+	const [randomGender, setRandomGender] = React.useState('');
 	const [selectedAnswer, setSelectedAnswer] = React.useState('');
-	const [isSubmitted, setIsSubmitted] = React.useState(false);
+	const [isCorrect, setIsCorrect] = React.useState(false);
+	const [answerStatus, setAnswerStatus] = React.useState(0);
+	const [isBottomSheetVisible, setIsBottomSheetVisible] = React.useState(false);
+
 	const viewRef = React.useRef(null);
 
-	const caseNames = ['nominative', 'accusative', 'dative', 'genitive'];
-	const caseGenders = ['masculine', 'feminine', 'neuter'];
 	
-	const buttonOpacity = new Value(1);
+	// const bottomSheetOpacity = React.useRef(new Value(0)).current;
 
-	const inputContainerZindex = interpolate(buttonOpacity, {
+	const { bottomSheetAnimation, clock, state  } = useMemoOne(
+    () => ({
+      bottomSheetAnimation: new Value(0),
+			clock: new Clock(),
+			state: new Value(State.UNDETERMINED)
+		}),
+    []
+	);
+	
+	Animated.useCode(() => 
+		block([
+			cond(eq(state, State.END),
+				set(
+					bottomSheetAnimation, 
+					runTiming(clock, 1000, isBottomSheetVisible ? 0 : 1, (isBottomSheetVisible ) ? 1 : 0)
+					))
+		]), [isBottomSheetVisible]
+	)
+
+	const answerContainerZindex = interpolate(bottomSheetAnimation, {
 		inputRange: [0, 1],
-		outputRange: [1, -1],
+		outputRange: [-1, 1],
 		extrapolate: Extrapolate.CLAMP
 	});
-	const inputContainerY = interpolate(buttonOpacity, {
-		inputRange: [0, 1],
-		outputRange: [0, 100],
-		extrapolate: Extrapolate.CLAMP
-	});
-	const inputContainerOpacity = interpolate(buttonOpacity, {
-		inputRange: [0, 1],
-		outputRange: [1, 0],
-		extrapolate: Extrapolate.CLAMP
-	});
+
+	// const buttonContainerZindex = interpolate(bottomSheetAnimation, {
+	// 	inputRange: [0, 1],
+	// 	outputRange: [1, 2],
+	// 	extrapolate: Extrapolate.CLAMP
+	// });
+
+  // Animated.useCode( () =>
+	// 	cond(
+	// 		eq(state, State.END),
+	// 		cond(
+	// 			eq(translateY, height/6),
+	// 			set(translateY, 0),
+	// 			set(translateY, height/6))
+	// 	), []
+  // );
 
 
 	const transition = (
@@ -79,16 +115,20 @@ const Home: React.FC = () => {
 	function getRandomCaseAndGender() {
 		const rnd1 = Math.floor(Math.random() * 4) + 0;
 		const rnd2 = Math.floor(Math.random() * 3) + 0;
-		setRndCaseGender([caseNames[rnd1], caseGenders[rnd2]]);
+		setRandomCase(caseNames[rnd1])
+		setRandomGender(genderNames[rnd2]);
 	}
 
 	function randomizeOptions() {
 		const shuffledOptions = [...caseArticles].sort(() => 0.5 - Math.random());
 		setCaseArticles(shuffledOptions);
-
+		
 		viewRef.current.animateNextTransition();
-
 		getRandomCaseAndGender();
+		
+		const arr = isSelected.map(() => false);
+		setIsSelected(arr);
+		setSelectedAnswer('');
 	}
 
 	function handleOnPress(value: string, index: number) {
@@ -101,57 +141,54 @@ const Home: React.FC = () => {
 		setSelectedAnswer(text);
 	}
 
-	function resetSelected(){
-		const arr = isSelected.map(() => false);
-		setIsSelected(arr);
-		setSelectedAnswer('');
-	}
-
 	function handleSubmitAnswer(){
 
-		if(!selectedAnswer) return;
-
-		const correctAnswer = cases[rndCaseGender[0]][rndCaseGender[1]];
-		if(selectedAnswer === correctAnswer){
-			Alert.alert('Correto!');
-			console.log("correto");
+		if(answerStatus === 0){
+			if(!selectedAnswer) return;
+			const correctAnswer = cases[randomCase][randomGender];
+			setIsCorrect(
+				selectedAnswer === correctAnswer ? true : false 
+			);
+			setAnswerStatus(1);
+			setIsBottomSheetVisible(!isBottomSheetVisible);
 		}else {
-			Alert.alert('Errado!', `A resposta correta é ${correctAnswer}!`);
-			console.log("errado " + correctAnswer);
+			setIsBottomSheetVisible(!isBottomSheetVisible);
+			randomizeOptions();
+			setAnswerStatus(0);
 		}
-		setIsSubmitted(!isSubmitted);
-		randomizeOptions();
-		resetSelected();
 	}
 
 
 	return (
-		<>
+		<View style={{flex: 1}}>
 			<Transitioning.View
 				style={{ flex: 1 }}
 				ref={viewRef}
 				transition={transition}
 			>
 				<View style={styles.container}>
+
 					<View style={styles.card} >
 						<Text style={styles.case} >
-							{rndCaseGender[0]}
+							{randomCase}
 						</Text>
 						<Text style={styles.gender}>
-							{rndCaseGender[1]}
+							{randomGender}
 						</Text>
 						<View style={[
 							styles.selectedTextContainer,
-							{backgroundColor: selectedAnswer === '' ? '#c9e9e5': 'transparent'}
+							{backgroundColor: selectedAnswer === '' ? Colors.caseSelection: 'transparent'}
 							]}>
 							<Text style={styles.selectedAnswer} >
 								{selectedAnswer}
 							</Text>
 						</View>
 					</View>
+
 				</View>
+				
 				<View style={styles.container}>
-					<View style={styles.optionsContainer}>
+					<View style={styles.optionsContainer}  pointerEvents={answerStatus === 1 ? 'none' : 'auto'}>
 						{caseArticles.map((value, index) => {
 							return (
 								<GridText 
@@ -165,22 +202,34 @@ const Home: React.FC = () => {
 
 				</View>
 			</Transitioning.View>
-			
-			<TouchableWithoutFeedback disabled={!selectedAnswer ? true : false} style={{ flex: 1 }} onPress={handleSubmitAnswer}>
-				<View style={[
-					styles.buttonContainer,
-					{ backgroundColor: selectedAnswer !== '' ? '#81cbc4' : '#F0F0F0' }
-				]}>
-					<Text style={[
-						styles.buttonText,
-						{ color: selectedAnswer !== '' ? 'white' : '#A9A9A9' }
-					]}>
-						ANSWER
-						{/* {isSubmitted ? 'NEXT' : 'ANSWER'} */}
-				</Text>
-				</View>
+
+			<TouchableWithoutFeedback
+				style={{ flex: 1, backgroundColor: 'blue', zIndex: 100 }}
+				disabled={!selectedAnswer ? true : false}
+				onPress={handleSubmitAnswer}>
+						<Animated.View style={{
+							...styles.buttonContainer,
+							zIndex: 1 ,
+							backgroundColor: selectedAnswer === '' ?
+								Colors.btnBgClear : ( 
+									(answerStatus === 1 && isCorrect === false) ? Colors.btnBgWrong : Colors.btnBgCorrect )
+						}}>
+						<Text style={[
+							styles.buttonText,
+							{ color: selectedAnswer !== '' ? Colors.btnTxtSelected : Colors.btnTxt }
+						]}>
+							{isBottomSheetVisible ? 'NEXT' : 'ANSWER'}
+						</Text>
+					</Animated.View>
 			</TouchableWithoutFeedback>
-		</>
+
+			<BottomSheet
+				isVisible={isBottomSheetVisible}
+				isCorrect={isCorrect}
+				text={isBottomSheetVisible ? cases[randomCase][randomGender] : ''}
+			/>
+
+		</View>
 	
 	)
 }
@@ -197,43 +246,51 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-around',
-		top: 20,
+		top: 0,
 		width: 300,
 		height: 100,
 	},
 	card: {
-		width: 200,
-		height: 150,
+		width: 250,
+		height: 200,
 		bottom: 10,
-		backgroundColor: '#81cbc4',
+		backgroundColor: Colors.cardBg,
 		borderRadius: 20,
-		elevation: 10,
 		padding: 20,
-		alignItems: 'center'
+		paddingTop: 40,
+		alignItems: 'center',
+		elevation: 10,
+		shadowColor: Colors.opBorderBottom,
+		shadowOffset: {
+			width: 0,
+			height: 1,
+		},
+		shadowOpacity: 0.22,
+		shadowRadius: 2.22,
+
 	},
 	case: {
 		fontFamily: 'Roboto_500Medium',
-		fontSize: 26,
-		color: 'white',
+		fontSize: 30,
+		color: Colors.cardCase,
 		textTransform: 'capitalize'
 	},
 	gender: {
 		fontFamily: 'Roboto_500Medium',
-		fontSize: 20,
-		color: '#3b9187',
+		fontSize: 24,
+		color: Colors.cardGender,
 		textTransform: 'capitalize'
 	},
 	selectedTextContainer: {
-		backgroundColor: '#c9e9e5',
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginTop: 15,
-		height: 30,
-		width: 70
+		height: 40,
+		width: 80
 	},
 	selectedAnswer: {
 		fontFamily: 'Roboto_500Medium',
-		fontSize: 18,
+		fontSize: 22,
 		color: 'white'
 	},
 	buttonContainer: {
@@ -246,13 +303,20 @@ const styles = StyleSheet.create({
 		margin: 20,
 		height: 50,
 		borderRadius: 25,
-		backgroundColor: '#F0F0F0',
-		overflow: 'hidden'
+
+		shadowColor: Colors.opBorderBottom,
+		shadowOffset: {
+			width: 0,
+			height: 1,
+		},
+		shadowOpacity: 0.22,
+		shadowRadius: 2.22,
+		elevation: 2,
+		// overflow: 'hidden'
 	},
 	buttonText: {
 		fontFamily: 'Roboto_400Regular',
 		fontSize: 16,
-		color: '#A9A9A9',
 		fontWeight: 'bold'
 	}
 });

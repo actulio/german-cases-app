@@ -12,7 +12,7 @@ const {
 	debug,
 } = Animated;
 
-function runTiming(clock, value, dest) {
+function runTiming(clock, duration, value, dest) {
   const state = {
     finished: new Value(0),
     position: new Value(0),
@@ -21,7 +21,7 @@ function runTiming(clock, value, dest) {
   };
 
   const config = {
-    duration: 1000,
+    duration: duration,
     toValue: new Value(0),
     easing: Easing.inOut(Easing.ease),
   };
