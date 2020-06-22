@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/lib/nodejs/node-v12.18.0-linux-x64/bin/node /usr/share/yarn/bin/yarn.js add @types/use-memo-one
+  /usr/local/lib/nodejs/node-v12.18.0-linux-x64/bin/node /usr/share/yarn/bin/yarn.js add react-native-header-buttons
 
 PATH: 
   /home/tulio/.npm-global/bin:/home/tulio/.npm-global/bin:/home/tulio/.zinit/polaris/sbin:/home/tulio/.zinit/polaris/bin:/home/tulio/.zinit/polaris/usr/sbin:/home/tulio/.zinit/polaris/usr/bin:/usr/local/lib/nodejs/node-v12.18.0-linux-x64/bin:/home/tulio/.nix-profile/bin:/home/tulio/.npm-global/bin:/home/tulio/.local/bin:/home/tulio/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/tulio/.platformio/penv/bin:/home/tulio/Android/Sdk/emulator:/home/tulio/Android/Sdk/tools:/home/tulio/Android/Sdk/tools/bin:/home/tulio/Android/Sdk/platform-tools:/home/tulio/Android/Sdk/emulator:/home/tulio/Android/Sdk/tools:/home/tulio/Android/Sdk/tools/bin:/home/tulio/Android/Sdk/platform-tools
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fuse-memo-one: Not found
+  Error: https://registry.yarnpkg.com/react-native-header-buttons: Not found
       at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66947:18)
       at Request.self.callback (/usr/share/yarn/lib/cli.js:140665:22)
       at Request.emit (events.js:315:20)

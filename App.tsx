@@ -1,7 +1,8 @@
 import React from 'react';
 import { AppLoading } from 'expo';
-import { StatusBar, StyleSheet } from 'react-native';
+import { StatusBar } from 'react-native';
 import { Roboto_400Regular, Roboto_500Medium, useFonts } from '@expo-google-fonts/roboto';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import Routes from './src/routes';
 
@@ -17,21 +18,13 @@ export default function App() {
 	}
 
   return (
-		<>
+		<PaperProvider>
 			<StatusBar
 				barStyle="dark-content"
 				backgroundColor="transparent"
 				translucent/>
 			<Routes/>
-		</>
+		</PaperProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

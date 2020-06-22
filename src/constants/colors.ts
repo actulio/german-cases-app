@@ -3,6 +3,8 @@ const Colors = {
 	cardCase: '#FFFFFF',
 	cardGender: '#007acc',
 	caseSelection: '#b3e0ff',
+	// cardBg: '#0098F3',
+	// cardGender: '#92d3ff',
 
 	btnBgClear: '#F0F0F0',
 	btnBgCorrect: '#81cbc4',

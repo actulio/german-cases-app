@@ -4,15 +4,17 @@ import {
 	Text,
 	StyleSheet,
 	TouchableWithoutFeedback,
-	Dimensions
+	Dimensions,
 } from 'react-native';
 import Animated, { Transition, Transitioning, Extrapolate } from 'react-native-reanimated'
-import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import { State } from 'react-native-gesture-handler';
 import {useMemoOne} from 'use-memo-one';
+import { useNavigation } from '@react-navigation/native'
+import * as AsyncStorageHelper from '../../constants/asyncStorageHelper';
 
 import runTiming from '../../constants/runTiming';
 import Colors from '../../constants/colors';
-import BottomSheet from '../../components/bottomSheet'
+import BottomSheet from '../../components/BottomSheet'
 
 const {
 	Value,
@@ -21,13 +23,11 @@ const {
 	eq,
 	set,
 	Clock,
-	interpolate,
 } = Animated;
 
 import { cases } from '../../constants/cases';
-import GridText from '../../components/gridText';
-
-const {width, height} = Dimensions.get('window');
+import GridText from '../../components/GridText';
+import Header from '../../components/Header';
 
 const Home: React.FC = () => {
 
@@ -41,6 +41,7 @@ const Home: React.FC = () => {
 		false, false, false, false, false, false
 	]);
 
+	const [count, setCount] = React.useState(0);
 	const [randomCase, setRandomCase] = React.useState('');
 	const [randomGender, setRandomGender] = React.useState('');
 	const [selectedAnswer, setSelectedAnswer] = React.useState('');
@@ -49,9 +50,25 @@ const Home: React.FC = () => {
 	const [isBottomSheetVisible, setIsBottomSheetVisible] = React.useState(false);
 
 	const viewRef = React.useRef(null);
+	const navigation = useNavigation();
 
+	React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => (
+				<Header count={count}/>
+      ),
+    });
+	}, [navigation, count]);
 	
-	// const bottomSheetOpacity = React.useRef(new Value(0)).current;
+	React.useEffect(() => {
+		async function getData(){
+			const obj = await AsyncStorageHelper.getData();
+			setCount(
+				obj === undefined ? 0 : obj.curr
+			)
+		}
+		getData();
+	}, []);
 
 	const { bottomSheetAnimation, clock, state  } = useMemoOne(
     () => ({
@@ -72,29 +89,6 @@ const Home: React.FC = () => {
 		]), [isBottomSheetVisible]
 	)
 
-	const answerContainerZindex = interpolate(bottomSheetAnimation, {
-		inputRange: [0, 1],
-		outputRange: [-1, 1],
-		extrapolate: Extrapolate.CLAMP
-	});
-
-	// const buttonContainerZindex = interpolate(bottomSheetAnimation, {
-	// 	inputRange: [0, 1],
-	// 	outputRange: [1, 2],
-	// 	extrapolate: Extrapolate.CLAMP
-	// });
-
-  // Animated.useCode( () =>
-	// 	cond(
-	// 		eq(state, State.END),
-	// 		cond(
-	// 			eq(translateY, height/6),
-	// 			set(translateY, 0),
-	// 			set(translateY, height/6))
-	// 	), []
-  // );
-
-
 	const transition = (
 		<Transition.Together>
 			<Transition.In
@@ -108,6 +102,7 @@ const Home: React.FC = () => {
 	);
 
 	React.useEffect(() => {
+		setCount(0);
 		viewRef.current.animateNextTransition();
 		getRandomCaseAndGender();
 	}, []);
@@ -146,9 +141,15 @@ const Home: React.FC = () => {
 		if(answerStatus === 0){
 			if(!selectedAnswer) return;
 			const correctAnswer = cases[randomCase][randomGender];
-			setIsCorrect(
-				selectedAnswer === correctAnswer ? true : false 
-			);
+			
+			if(selectedAnswer === correctAnswer){
+				setCount(state => state + 1)
+				setIsCorrect(true);
+			}else {
+				setIsCorrect(false);
+				setCount(0);
+			}
+
 			setAnswerStatus(1);
 			setIsBottomSheetVisible(!isBottomSheetVisible);
 		}else {
@@ -160,7 +161,9 @@ const Home: React.FC = () => {
 
 
 	return (
+
 		<View style={{flex: 1}}>
+
 			<Transitioning.View
 				style={{ flex: 1 }}
 				ref={viewRef}
@@ -203,8 +206,9 @@ const Home: React.FC = () => {
 				</View>
 			</Transitioning.View>
 
+
 			<TouchableWithoutFeedback
-				style={{ flex: 1, backgroundColor: 'blue', zIndex: 100 }}
+				style={{ flex: 1, backgroundColor: 'blue', zIndex: 1 }}
 				disabled={!selectedAnswer ? true : false}
 				onPress={handleSubmitAnswer}>
 						<Animated.View style={{
@@ -212,7 +216,7 @@ const Home: React.FC = () => {
 							zIndex: 1 ,
 							backgroundColor: selectedAnswer === '' ?
 								Colors.btnBgClear : ( 
-									(answerStatus === 1 && isCorrect === false) ? Colors.btnBgWrong : Colors.btnBgCorrect )
+									(answerStatus === 1 && isCorrect === false) ? Colors.btnBgWrong : Colors.btnBgCorrect ),
 						}}>
 						<Text style={[
 							styles.buttonText,
@@ -230,7 +234,6 @@ const Home: React.FC = () => {
 			/>
 
 		</View>
-	
 	)
 }
 
