@@ -1,14 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { DataTable } from 'react-native-paper';
+import {ThemeContext} from '../../themes/theme-context';
 
 import * as AsyncStorageHelper from '../../constants/asyncStorageHelper';
-
-import { YellowBox } from 'react-native';
-
-YellowBox.ignoreWarnings([
-  'Non-serializable values were found in the navigation state',
-]);
 
 interface countObj {
 	curr: number;
@@ -17,8 +12,8 @@ interface countObj {
 
 const Table = () => {
 
-	// const navigation = useNavigation();
-
+	const {theme} = React.useContext(ThemeContext);
+	
 	React.useEffect(() => {
 		async function resetCurrent(){
 			const oldValues : countObj = await AsyncStorageHelper.getData();
@@ -28,9 +23,9 @@ const Table = () => {
 	}, []);
 
 	return (
-		<View style={styles.container}>
+		<View style={{...styles.container,backgroundColor: theme.bodyBg}}>
 			{/* <Image style={{flex: 1}}  source={require('../../assets/table.png')} /> */}
-			<DataTable style={styles.table}>
+			<DataTable style={{...styles.table, backgroundColor: 'lightgrey'}}>
 				<DataTable.Header>
 					<DataTable.Title ></DataTable.Title>
 					<DataTable.Title numeric>Masc.</DataTable.Title>
@@ -89,11 +84,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 10,
 		top: -100,
-		backgroundColor: 'white'
 	},
 	table: {
 		borderWidth: 1,  
-		// borderColor: '#D3D3D3',
+		borderColor: '#D3D3D3',
 		borderRadius: 10,
 		padding: 10,
 		paddingBottom: 20

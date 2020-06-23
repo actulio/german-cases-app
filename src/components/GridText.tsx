@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Colors from '../constants/colors';
+
+import {ThemeContext} from '../themes/theme-context'
 
 interface Props {
 	isSelected: boolean;
@@ -11,16 +12,25 @@ interface Props {
 const GridText = (props: Props) => {
 
 	const { isSelected, text, onPress } = props;
+	const {theme} = React.useContext(ThemeContext);
 
 	return (
 		<TouchableOpacity 
 			onPress={onPress}
 			activeOpacity={.3}
-			style={[styles.textContainer, 
-				isSelected ? styles.selected : {}
+			style={[styles.textContainer,
+				isSelected ? {
+					borderColor: theme.opSelectedBg,
+					borderBottomColor: theme.opSelectedBgBottom,
+					backgroundColor: theme.opSelectedBg
+				} : {
+					borderColor: theme.opBorder,
+					borderBottomColor: theme.opBorderBottom,
+					backgroundColor: theme.opBg
+				},
 			]}
 		>
-			<Text style={styles.text}>{text}</Text>
+			<Text style={{...styles.text, color: theme.opTxt,}}>{text}</Text>
 		</TouchableOpacity>
 	);
 }
@@ -34,21 +44,13 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		height: 50,
 		width: 80,
-		borderColor: Colors.opBorder,
 		borderWidth: 1,
 		borderBottomWidth: 4,
-		borderBottomColor: Colors.opBorderBottom
 	},
 	text: {
 		fontSize: 16,
-		color: Colors.opTxt,
 		fontFamily: 'Roboto_400Regular'
 	},
-	selected: {
-		borderColor: Colors.opSelectedBg,
-		borderBottomColor: Colors.opSelectedBgBottom,
-		backgroundColor: Colors.opSelectedBg
-	}
 
 })
 

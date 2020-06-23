@@ -9,7 +9,4 @@
     "resolveJsonModule": true,
 		"strict": true
 	},
-	"include": [
-		"decs.d.ts"
-	]
 }

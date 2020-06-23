@@ -4,12 +4,12 @@ import {useNavigation} from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Menu } from 'react-native-paper';
 
-import Colors from '../constants/colors';
-
+import {ThemeContext} from '../themes/theme-context';
 
 const HeaderButton: React.FC = () => {
 
 	const [isVisible, setIsVisible] = React.useState(false);
+	const {theme, toggleTheme} = React.useContext(ThemeContext);
 
 	const navigation = useNavigation();
 
@@ -35,6 +35,7 @@ const HeaderButton: React.FC = () => {
 
 	function toggleDarkMode(){
 		//handle dark mode
+		toggleTheme();
 	}
 
 	return (
@@ -45,19 +46,19 @@ const HeaderButton: React.FC = () => {
 					anchor={
 						<View style={styles.menu}>
 							<TouchableOpacity style={styles.menu} onPress={() => setIsVisible(!isVisible)}>
-								<Ionicons name="md-more" size={30} color="black" />
+								<Ionicons name="md-more" size={30} color={theme.btnTxt} />
 							</TouchableOpacity>
 						</View>
 					}
-					contentStyle={{}}
+					contentStyle={{backgroundColor: theme.menuBg}}
 				>
 					<Menu.Item
 						onPress={toggleDarkMode}
-						theme={{ colors: { text: Colors.opTxt}}}
+						theme={{ colors: { text: theme.menuText}}}
 						title="Dark Mode" />
 					<Menu.Item
 						onPress={handleGoToArticles}
-						theme={{ colors: { text: Colors.opTxt } }}
+						theme={{ colors: { text: theme.menuText } }}
 						title="Articles" />
 				</Menu>
 	
@@ -79,13 +80,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		width: 40,
 		height: 40,
-	},
-	menuText: {
-		marginVertical: 5,
-		marginHorizontal: 5,
-		color: Colors.opTxt,
-		fontSize: 16,
-		fontFamily: 'Roboto_400Regular'
 	}
 })
 

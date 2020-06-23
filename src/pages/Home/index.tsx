@@ -4,17 +4,16 @@ import {
 	Text,
 	StyleSheet,
 	TouchableWithoutFeedback,
-	Dimensions,
 } from 'react-native';
-import Animated, { Transition, Transitioning, Extrapolate } from 'react-native-reanimated'
+import Animated, { Transition, Transitioning } from 'react-native-reanimated'
 import { State } from 'react-native-gesture-handler';
 import {useMemoOne} from 'use-memo-one';
 import { useNavigation } from '@react-navigation/native'
 import * as AsyncStorageHelper from '../../constants/asyncStorageHelper';
 
 import runTiming from '../../constants/runTiming';
-import Colors from '../../constants/colors';
-import BottomSheet from '../../components/BottomSheet'
+import BottomSheet from '../../components/BottomSheet';
+import {ThemeContext} from '../../themes/theme-context';
 
 const {
 	Value,
@@ -27,7 +26,7 @@ const {
 
 import { cases } from '../../constants/cases';
 import GridText from '../../components/GridText';
-import Header from '../../components/Header';
+import Header from '../../components/HeaderProgress';
 
 const Home: React.FC = () => {
 
@@ -51,6 +50,8 @@ const Home: React.FC = () => {
 
 	const viewRef = React.useRef(null);
 	const navigation = useNavigation();
+
+	const {theme} = React.useContext(ThemeContext);
 
 	React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -165,22 +166,22 @@ const Home: React.FC = () => {
 		<View style={{flex: 1}}>
 
 			<Transitioning.View
-				style={{ flex: 1 }}
+				style={{ flex: 1, backgroundColor: theme.bodyBg }}
 				ref={viewRef}
 				transition={transition}
 			>
-				<View style={styles.container}>
+				<View style={{...styles.container}}>
 
-					<View style={styles.card} >
-						<Text style={styles.case} >
+					<View style={{...styles.card, backgroundColor: theme.cardBg}} >
+						<Text style={{...styles.case, color: theme.cardCase,}} >
 							{randomCase}
 						</Text>
-						<Text style={styles.gender}>
+						<Text style={{...styles.gender, color: theme.cardGender}}>
 							{randomGender}
 						</Text>
 						<View style={[
 							styles.selectedTextContainer,
-							{backgroundColor: selectedAnswer === '' ? Colors.caseSelection: 'transparent'}
+							{backgroundColor: selectedAnswer === '' ? theme.caseSelection: 'transparent'}
 							]}>
 							<Text style={styles.selectedAnswer} >
 								{selectedAnswer}
@@ -196,7 +197,7 @@ const Home: React.FC = () => {
 							return (
 								<GridText 
 									key={value}
-									onPress={handleOnPress.bind(this, value, index)}
+									onPress={() => handleOnPress(value,index)}
 									isSelected={isSelected[index]} 
 									text={value} />
 							)
@@ -208,20 +209,24 @@ const Home: React.FC = () => {
 
 
 			<TouchableWithoutFeedback
-				style={{ flex: 1, backgroundColor: 'blue', zIndex: 1 }}
+				style={{ flex: 1, zIndex: 1 }}
 				disabled={!selectedAnswer ? true : false}
 				onPress={handleSubmitAnswer}>
 						<Animated.View style={{
 							...styles.buttonContainer,
 							zIndex: 1 ,
 							backgroundColor: selectedAnswer === '' ?
-								Colors.btnBgClear : ( 
-									(answerStatus === 1 && isCorrect === false) ? Colors.btnBgWrong : Colors.btnBgCorrect ),
+								theme.btnBgClear : (
+									answerStatus === 0 ? theme.btnBgSelected :
+										(isCorrect === true) ? theme.btnBgCorrect : theme.btnBgWrong ),
 						}}>
-						<Text style={[
-							styles.buttonText,
-							{ color: selectedAnswer !== '' ? Colors.btnTxtSelected : Colors.btnTxt }
-						]}>
+						<Text style={{
+							...styles.buttonText,
+							color: selectedAnswer === '' ?
+								theme.btnTxt : (
+									answerStatus === 0 ? theme.btnTxtSelected :
+										(isCorrect === true) ? theme.btnTxtCorrect : theme.btnTxtWrong ),
+						}}>
 							{isBottomSheetVisible ? 'NEXT' : 'ANSWER'}
 						</Text>
 					</Animated.View>
@@ -242,7 +247,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: 'white'
 	},
 	optionsContainer: {
 		flex: 1,
@@ -257,13 +261,12 @@ const styles = StyleSheet.create({
 		width: 250,
 		height: 200,
 		bottom: 10,
-		backgroundColor: Colors.cardBg,
 		borderRadius: 20,
 		padding: 20,
 		paddingTop: 40,
 		alignItems: 'center',
 		elevation: 10,
-		shadowColor: Colors.opBorderBottom,
+		shadowColor: '#D3D3D3',
 		shadowOffset: {
 			width: 0,
 			height: 1,
@@ -275,13 +278,11 @@ const styles = StyleSheet.create({
 	case: {
 		fontFamily: 'Roboto_500Medium',
 		fontSize: 30,
-		color: Colors.cardCase,
 		textTransform: 'capitalize'
 	},
 	gender: {
 		fontFamily: 'Roboto_500Medium',
 		fontSize: 24,
-		color: Colors.cardGender,
 		textTransform: 'capitalize'
 	},
 	selectedTextContainer: {
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
 		height: 50,
 		borderRadius: 25,
 
-		shadowColor: Colors.opBorderBottom,
+		shadowColor: '#D3D3D3',
 		shadowOffset: {
 			width: 0,
 			height: 1,

@@ -21,8 +21,11 @@ const Colors = {
 	opSelectedBgBottom: '#C8C8C8',
 	opTxt: '#454545',
 	opBorder: '#E8E8E8',
-	opBorderBottom: '#D3D3D3'
+	opBorderBottom: '#D3D3D3',
 
+	progressBarBg: '#E8E8E8',
+	progressBarFill: '#a4dab2',
+	progressBarInner: '#dbf0e0',
 
 }
 

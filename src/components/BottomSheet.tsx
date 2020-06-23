@@ -1,9 +1,9 @@
 import React from 'react';
-import { TouchableWithoutFeedback, Text, StyleSheet, Dimensions } from 'react-native';
-import Animated, { Easing } from "react-native-reanimated";
+import { Text, StyleSheet, Dimensions } from 'react-native';
+import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 
-import Colors from '..//constants/colors';
+import {ThemeContext} from '../themes/theme-context';
 import runTiming from '../constants/runTiming';
 
 const {
@@ -26,6 +26,8 @@ interface Props {
 const {width, height} = Dimensions.get('window');
 
 const BottomSheet:React.FC<Props> = ({isVisible, isCorrect, text }) => {
+
+	const {theme} = React.useContext(ThemeContext);
 
   const { animation, clock } = useMemoOne(
     () => ({
@@ -81,14 +83,14 @@ const BottomSheet:React.FC<Props> = ({isVisible, isCorrect, text }) => {
 					transform: [{
 						translateY: transY
 					}],
-					backgroundColor: isCorrect ? Colors.bsBgCorrect : Colors.bsBgWrong ,
+					backgroundColor: isCorrect ? theme.bsBgCorrect : theme.bsBgWrong ,
 				}}
 			>
 
 			{isCorrect ? (
-				<Text style={{ ...styles.text, color: Colors.bsTxtCorrect }}>Correct!</Text>
+				<Text style={{ ...styles.text, color: theme.bsTxtCorrect }}>Correct!</Text>
 			) :(
-				<Text style={{ ...styles.text, color: Colors.bsTxtWrong }}>
+				<Text style={{ ...styles.text, color: theme.bsTxtWrong }}>
 					The correct answer is: {text.charAt(0).toUpperCase().concat(text.slice(1))}
 				</Text>
 			)}
