@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Menu } from 'react-native-paper';
 
-import {ThemeContext} from '../themes/theme-context';
+import {ThemeContext, themes} from '../themes/theme-context';
 
 const HeaderButton: React.FC = () => {
 
@@ -34,7 +34,7 @@ const HeaderButton: React.FC = () => {
 	}
 
 	function toggleDarkMode(){
-		//handle dark mode
+		setIsVisible(!isVisible);
 		toggleTheme();
 	}
 
@@ -55,7 +55,7 @@ const HeaderButton: React.FC = () => {
 					<Menu.Item
 						onPress={toggleDarkMode}
 						theme={{ colors: { text: theme.menuText}}}
-						title="Dark Mode" />
+						title={theme === themes.light ? 'Dark Mode' : 'Light Mode'} />
 					<Menu.Item
 						onPress={handleGoToArticles}
 						theme={{ colors: { text: theme.menuText } }}

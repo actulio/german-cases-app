@@ -17,15 +17,14 @@ const Table = () => {
 	React.useEffect(() => {
 		async function resetCurrent(){
 			const oldValues : countObj = await AsyncStorageHelper.getData();
-			await AsyncStorageHelper.storeData(0, oldValues.max);
+			await AsyncStorageHelper.storeData(0, oldValues === undefined ? 0 : oldValues.max );
 		}
 		resetCurrent();
 	}, []);
 
 	return (
 		<View style={{...styles.container,backgroundColor: theme.bodyBg}}>
-			{/* <Image style={{flex: 1}}  source={require('../../assets/table.png')} /> */}
-			<DataTable style={{...styles.table, backgroundColor: 'lightgrey'}}>
+			<DataTable style={{...styles.table, backgroundColor: theme.tableBg}}>
 				<DataTable.Header>
 					<DataTable.Title ></DataTable.Title>
 					<DataTable.Title numeric>Masc.</DataTable.Title>

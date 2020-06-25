@@ -39,6 +39,8 @@ export const themes = {
 		progressBarBg: '#E8E8E8',
 		progressBarFill: '#a4dab2',
 		progressBarInner: '#dbf0e0',
+
+		tableBg: '#FFFFFF'
 	},
 	dark: {
 		bodyBg: '#121212',
@@ -76,6 +78,8 @@ export const themes = {
 		progressBarBg: '#E8E8E8',
 		progressBarFill: '#ff4d4d',
 		progressBarInner: '#dbf0e0',
+
+		tableBg: '#C8C8C8'
 	}
 }
 // #ff4d4d , #ffff99

@@ -59,7 +59,7 @@ const Routes = () => {
 						headerRight: () => <HeaderButton/>
 					}}
 				/>
-				<AppStack.Screen name="Table" component={Table} />
+				<AppStack.Screen options={{title: 'Articles Table'}} name="Table" component={Table} />
 			</AppStack.Navigator>
 		</NavigationContainer>
 	)

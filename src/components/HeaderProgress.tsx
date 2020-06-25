@@ -57,17 +57,11 @@ const Header = ({count = 0}) => {
 			() => {
 				async function getData(){
 					const obj: countObj = await AsyncStorageHelper.getData();
-					if(obj === undefined || obj === null) {
-						await AsyncStorageHelper.storeData(0, 0);
-						setMaximum(0);
-						setCurrent(0);
-					}else{
-						setMaximum(obj.max);
-						setCurrent(obj.curr);
-						setIsReady(true);
-						const prog = (obj.curr*obj.max) === 0 ? 0 : (obj.curr)/obj.max;
-						setProgress(prog > 1 ? 1 : prog);
-					}
+					setCurrent(obj.curr);
+					setMaximum(obj.max);
+					setIsReady(true);
+					const prog = (obj.curr * obj.max) === 0 ? 0 : (obj.curr) / obj.max;
+					setProgress(prog > 1 ? 1 : prog);
 				}
 				getData();
 			}
