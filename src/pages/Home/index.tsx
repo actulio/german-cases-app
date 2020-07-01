@@ -40,7 +40,9 @@ const Home: React.FC = () => {
 		false, false, false, false, false, false
 	]);
 
-	const [count, setCount] = React.useState(0);
+	const [current, setCurrent] = React.useState(0);
+	const [maximum, setMaximum] = React.useState(0);
+	const [isReady, setIsReady] = React.useState(false);
 	const [randomCase, setRandomCase] = React.useState('');
 	const [randomGender, setRandomGender] = React.useState('');
 	const [selectedAnswer, setSelectedAnswer] = React.useState('');
@@ -54,22 +56,32 @@ const Home: React.FC = () => {
 	const {theme} = React.useContext(ThemeContext);
 
 	React.useLayoutEffect(() => {
+		const listener = navigation.addListener(
+			'focus',
+			() => {
+				async function getData(){
+					const obj = await AsyncStorageHelper.getData();		
+					setCurrent(obj.curr);
+					setMaximum(obj.max);
+					setIsReady(true);
+				}
+				getData();
+			}
+			);
+		// return navigation.removeListener("focus", listener);
+	}, []);
+
+	React.useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-				<Header count={count}/>
+				<Header current={current} maximum={maximum} isReady={isReady}/>
       ),
-    });
-	}, [navigation, count]);
-	
-	React.useEffect(() => {
-		async function getData(){
-			const obj = await AsyncStorageHelper.getData();
-			setCount(
-				obj === undefined ? 0 : obj.curr
-			)
+		});
+		if(isReady){
+			AsyncStorageHelper.storeData(current, current > maximum ? current : maximum);
 		}
-		getData();
-	}, []);
+
+	}, [current, maximum, isReady]);
 
 	const { bottomSheetAnimation, clock, state  } = useMemoOne(
     () => ({
@@ -103,7 +115,7 @@ const Home: React.FC = () => {
 	);
 
 	React.useEffect(() => {
-		setCount(0);
+		setCurrent(0);
 		viewRef.current.animateNextTransition();
 		getRandomCaseAndGender();
 	}, []);
@@ -144,11 +156,15 @@ const Home: React.FC = () => {
 			const correctAnswer = cases[randomCase][randomGender];
 			
 			if(selectedAnswer === correctAnswer){
-				setCount(state => state + 1)
+				if(current + 1 > maximum) {
+					setMaximum(current + 1)
+				}
+				setCurrent(current + 1);
+				
 				setIsCorrect(true);
 			}else {
 				setIsCorrect(false);
-				setCount(0);
+				setCurrent(0);
 			}
 
 			setAnswerStatus(1);

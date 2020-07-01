@@ -1,21 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import * as AsyncStorageHelper from '../constants/asyncStorageHelper';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import Animated, {Easing, Extrapolate, concat} from 'react-native-reanimated';
 
 import {ThemeContext} from '../themes/theme-context'
 
-interface countObj {
-	curr: number;
-	max: number;
+interface Props {
+	current: number;
+	maximum: number;
+	isReady: boolean;
 }
 
-const Header = ({count = 0}) => {
+const Header = ({current = 0, maximum = 0, isReady = false} : Props) => {
 
-	const [maximum, setMaximum] = React.useState(0);
-	const [current, setCurrent] = React.useState(0);
-	const [isReady, setIsReady] = React.useState(false);
 	const [progress, setProgress] = React.useState(0);
 
 	const {theme} = React.useContext(ThemeContext);
@@ -35,38 +31,11 @@ const Header = ({count = 0}) => {
     extrapolate: Extrapolate.CLAMP
 	});
 
-	const navigation = useNavigation();
+	React.useLayoutEffect(() => {
+		const prog = (current*maximum) === 0 ? 0 : (current)/maximum;
+		setProgress(prog > 1 ? 1 : prog);
+	}, [current, maximum]);
 
-	React.useEffect(() => {
-		async function storeData(){
-			if(isReady){
-				if(count > maximum) setMaximum(count);
-
-				await AsyncStorageHelper.storeData(count, count > maximum ? count : maximum);
-				const prog = (count*maximum) === 0 ? 0 : (count)/maximum;
-				setProgress(prog > 1 ? 1 : prog);
-			}
-		}
-		storeData();
-		setCurrent(count);
-	}, [count]);
-
-	React.useEffect(() => {
-		navigation.addListener(
-			'focus',
-			() => {
-				async function getData(){
-					const obj: countObj = await AsyncStorageHelper.getData();
-					setCurrent(obj.curr);
-					setMaximum(obj.max);
-					setIsReady(true);
-					const prog = (obj.curr * obj.max) === 0 ? 0 : (obj.curr) / obj.max;
-					setProgress(prog > 1 ? 1 : prog);
-				}
-				getData();
-			}
-		);
-	}, []);
 
 	return (
 		<View style={styles.container}>
@@ -84,12 +53,18 @@ const Header = ({count = 0}) => {
 				</View>
 			</View>
 
-			<Text style={{
-				...styles.number,
-				color: current === maximum ? theme.headerCountMax : theme.headerCount,
-			}}>
-				{current}/{maximum}
-			</Text>
+			{isReady ? (
+				<Text style={{
+					...styles.number,
+					color: current === maximum ? theme.headerCountMax : theme.headerCount,
+				}}>
+					{`${current}/${maximum}`}
+				</Text>
+			) : (
+					<ActivityIndicator color={theme.progressBarFill} />
+				)
+			}
+
 		</View>
 	);
 }
