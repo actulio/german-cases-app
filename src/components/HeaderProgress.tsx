@@ -56,7 +56,7 @@ const Header = ({current = 0, maximum = 0, isReady = false} : Props) => {
 			{isReady ? (
 				<Text style={{
 					...styles.number,
-					color: current === maximum ? theme.headerCountMax : theme.headerCount,
+					color: current === maximum ? (maximum === 0 ? theme.headerCount : theme.headerCountMax) : theme.headerCount,
 				}}>
 					{`${current}/${maximum}`}
 				</Text>

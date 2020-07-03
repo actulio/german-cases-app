@@ -1,4 +1,4 @@
-## Project title
+## German Cases App
 This project is a simple app in React Native made with Typescript and the expo managed workflow where one can exercise its knowledge about german articles.
 
 ## Motivation

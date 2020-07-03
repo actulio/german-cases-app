@@ -1,8 +1,8 @@
 import { Alert, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const APPID = 'german-cases-app';
-const APPTHEMEID = 'german-cases-app-theme';
+const APPID = 'com.actulio.german-cases';
+const APPTHEMEID = 'com.actulio.german-cases-theme';
 
 function handleError(title: string, error: any, exit = false){
 	Alert.alert( title, error );

@@ -11,8 +11,8 @@ export const themes = {
 		caseSelection: '#b3e0ff',
 
 		btnBgClear: '#F0F0F0',
-		btnBgSelected: '#81cbc4',
-		btnBgCorrect: '#81cbc4',
+		btnBgSelected: '#a4dab2',
+		btnBgCorrect: '#a4dab2',
 		btnBgWrong: '#ed4337',
 		btnTxt: '#A9A9A9',
 		btnTxtSelected: '#FFFFFF',
@@ -21,7 +21,7 @@ export const themes = {
 
 		bsTxtCorrect: '#3b9187',
 		bsTxtWrong: '#ed4337',
-		bsBgCorrect: '#81cbc4',
+		bsBgCorrect: '#dbf0e1',
 		bsBgWrong: '#ffcccc',
 
 		opBg: '#FFFFFF',
@@ -35,7 +35,7 @@ export const themes = {
 		menuBg: '#FFFFFF',
 
 		headerCount: '#C8C8C8',
-		headerCountMax : '#81cbc4',
+		headerCountMax : '#a4dab2',
 		progressBarBg: '#E8E8E8',
 		progressBarFill: '#a4dab2',
 		progressBarInner: '#dbf0e0',
